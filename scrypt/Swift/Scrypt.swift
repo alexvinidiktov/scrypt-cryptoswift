@@ -12,6 +12,7 @@ import CryptoSwift
 import Foundation
 
 //import scryptC
+import CImpl
 
 /// A key derivation function.
 ///
