@@ -17,9 +17,15 @@ let package = Package(
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
+	.target(
+            name: "CImpl",
+            path: "./scrypt/C",
+            sources: ["Cimpl.c", "Cimpl.h"],
+            publicHeadersPath: "scrypt/C"
+        ),    
         .target(
             name: "scrypt",
-            dependencies: ["CryptoSwift"],
+            dependencies: ["CryptoSwift", "CImpl"],
             path: "./scrypt/Swift",
             sources: ["Scrypt.swift", "PointerArithmeticsImplimentation.swift"],
             publicHeadersPath: "./"
