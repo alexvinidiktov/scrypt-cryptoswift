@@ -71,29 +71,29 @@ public struct Scrypt {
     }
     
     public func calculate() throws -> Array<UInt8> {
-        return try calculateNatively()
-//        return try calculateUsingC()
+//        return try calculateNatively()
+        return try calculateUsingC()
     }
     
-    public func calculateNatively() throws -> Array<UInt8> {
-        let paDeriver = try ScryptPA.init(password: self.password, salt: self.salt, dkLen: self.dkLen, N: self.N, r: self.r, p: self.p)
-        return try paDeriver.calculate()
-    }
-    
-//    public func calculateUsingC() throws -> Array<UInt8> {
-//        var kdf = try CryptoSwift.PKCS5.PBKDF2(password: password, salt: salt, iterations: 1, keyLength: blocksize*p, variant: .sha256)
-//        var B = try kdf.calculate()
-//
-//        let extraMemoryLength = 128 * r * N + 256 * r + 64
-//        var extraMemory = [UInt8](repeating: 0, count: extraMemoryLength)
-//
-//        let res = partial_Scrypt(UInt64(N), UInt32(r), UInt32(p), &B, B.count, &extraMemory, extraMemoryLength)
-//        if res != 0 {
-//            throw Error.derivedKeyTooLong
-//        }
-//        kdf = try CryptoSwift.PKCS5.PBKDF2(password: self.password, salt: B, iterations: 1, keyLength: dkLen, variant: .sha256)
-//        let ret = try kdf.calculate()
-//        return Array(ret)
+//    public func calculateNatively() throws -> Array<UInt8> {
+//        let paDeriver = try ScryptPA.init(password: self.password, salt: self.salt, dkLen: self.dkLen, N: self.N, r: self.r, p: self.p)
+//        return try paDeriver.calculate()
 //    }
+    
+    public func calculateUsingC() throws -> Array<UInt8> {
+        var kdf = try CryptoSwift.PKCS5.PBKDF2(password: password, salt: salt, iterations: 1, keyLength: blocksize*p, variant: .sha256)
+        var B = try kdf.calculate()
+
+        let extraMemoryLength = 128 * r * N + 256 * r + 64
+        var extraMemory = [UInt8](repeating: 0, count: extraMemoryLength)
+
+        let res = partial_Scrypt(UInt64(N), UInt32(r), UInt32(p), &B, B.count, &extraMemory, extraMemoryLength)
+        if res != 0 {
+            throw Error.derivedKeyTooLong
+        }
+        kdf = try CryptoSwift.PKCS5.PBKDF2(password: self.password, salt: B, iterations: 1, keyLength: dkLen, variant: .sha256)
+        let ret = try kdf.calculate()
+        return Array(ret)
+    }
     
 }
